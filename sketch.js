@@ -3,10 +3,16 @@ let shootingStars = [];
 let slant;
 
 function setup() {
+  pixelDensity(1); // prevent Retina scaling weirdness
   createCanvas(windowWidth, windowHeight);
   frameRate(60);
   angleMode(RADIANS);
   slant = PI / 6;
+  initStars();
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
   initStars();
 }
 
