@@ -77,11 +77,14 @@ function draw() {
 
 function initStars() {
   stars = [];
-  let starCount = 1600; // More stars, better coverage
+  let starCount = 1800;
+  let maxRadius = dist(0, 0, width / 2, height / 2) * 1.5;
 
   for (let i = 0; i < starCount; i++) {
-    let x = random(-width * 0.75, width * 0.75);   // Larger spread
-    let y = random(-height * 0.75, height * 0.75); // Taller spread
+    let angle = random(TWO_PI);
+    let radius = sqrt(random()) * maxRadius; // uniform circular spread
+    let x = radius * cos(angle);
+    let y = radius * sin(angle);
     stars.push({
       initialX: x,
       initialY: y,
