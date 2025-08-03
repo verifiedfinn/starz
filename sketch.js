@@ -1,10 +1,8 @@
 let stars = [];
 let shootingStars = [];
 let slant;
-let fadingIn = true;
-let fadeAlpha = 0;
+let fadeAlpha = 255;
 let starCount = 1800;
-let starsInitialized = false;
 
 function setup() {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -13,36 +11,19 @@ function setup() {
   frameRate(60);
   angleMode(RADIANS);
   slant = PI / 6;
+  initStars();
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  starsInitialized = false; // trigger re-init
+  initStars();
 }
 
 function draw() {
   let t = frameCount / 600;
   background(0);
-
-  // Fade-in logic
-  if (fadingIn) {
-    fadeAlpha += 8;
-    if (fadeAlpha >= 255) {
-      fadeAlpha = 255;
-      fadingIn = false;
-    }
-  }
-
-  // Lazy-load stars after fade begins
-  if (!starsInitialized && fadeAlpha > 50) {
-    initStars();
-    starsInitialized = true;
-  }
-
-  // Stop here if still fading
-  if (fadeAlpha < 255) return;
-
   noStroke();
+
   let baseAngle = TWO_PI * 0.04 * t;
 
   // Draw stars
@@ -101,6 +82,14 @@ function draw() {
       shootingStars.splice(i, 1);
     }
   }
+
+  // Draw fade on top
+  if (fadeAlpha > 0) {
+    fill(0, fadeAlpha);
+    rect(0, 0, width, height);
+    fadeAlpha -= 2.5; // slows fade: ~100 frames = 1.6s
+    fadeAlpha = max(fadeAlpha, 0);
+  }
 }
 
 function initStars() {
@@ -123,4 +112,6 @@ function initStars() {
     });
   }
 }
+
+
 
