@@ -5,9 +5,17 @@ let fadeAlpha = 255;
 let starCount = 1800;
 
 function setup() {
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  pixelDensity(isMobile ? 1 : (window.devicePixelRatio || 1));
-  createCanvas(windowWidth, windowHeight);
+  const ratio = window.devicePixelRatio || 1;
+  pixelDensity(ratio); // MUST come before createCanvas
+
+  const w = Math.floor(window.innerWidth);
+  const h = Math.floor(window.innerHeight);
+  createCanvas(w, h);
+
+  // Force style size to match actual pixels to avoid blurry scale
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+
   frameRate(60);
   angleMode(RADIANS);
   slant = PI / 6;
@@ -15,7 +23,11 @@ function setup() {
 }
 
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
+  const w = Math.floor(window.innerWidth);
+  const h = Math.floor(window.innerHeight);
+  resizeCanvas(w, h);
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
   initStars();
 }
 
@@ -87,7 +99,7 @@ function draw() {
   if (fadeAlpha > 0) {
     fill(0, fadeAlpha);
     rect(0, 0, width, height);
-    fadeAlpha -= 2.5; // slows fade: ~100 frames = 1.6s
+    fadeAlpha -= 2.5;
     fadeAlpha = max(fadeAlpha, 0);
   }
 }
