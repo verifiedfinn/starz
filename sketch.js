@@ -1,29 +1,51 @@
 let stars = [];
 let shootingStars = [];
 let slant;
+let fadingIn = true;
+let fadeAlpha = 0;
+let starCount = 1800;
+let starsInitialized = false;
 
 function setup() {
-  pixelDensity(1); // prevent Retina scaling weirdness
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  pixelDensity(isMobile ? 1 : (window.devicePixelRatio || 1));
   createCanvas(windowWidth, windowHeight);
   frameRate(60);
   angleMode(RADIANS);
   slant = PI / 6;
-  initStars();
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  initStars();
+  starsInitialized = false; // trigger re-init
 }
 
 function draw() {
-  let t = frameCount / 600; // smooth time
+  let t = frameCount / 600;
   background(0);
+
+  // Fade-in logic
+  if (fadingIn) {
+    fadeAlpha += 8;
+    if (fadeAlpha >= 255) {
+      fadeAlpha = 255;
+      fadingIn = false;
+    }
+  }
+
+  // Lazy-load stars after fade begins
+  if (!starsInitialized && fadeAlpha > 50) {
+    initStars();
+    starsInitialized = true;
+  }
+
+  // Stop here if still fading
+  if (fadeAlpha < 255) return;
+
   noStroke();
+  let baseAngle = TWO_PI * 0.04 * t;
 
-  let baseAngle = TWO_PI * 0.04 * t; // slow rotation
-
-  // Rotate stars with sky tilt
+  // Draw stars
   for (let star of stars) {
     star.opacity = map(sin(TWO_PI * t * star.twinkleSpeed * 4 + star.offset), -1, 1, 0.3, 1);
     fill(star.hue, star.hue, 255, star.opacity * 255);
@@ -35,10 +57,10 @@ function draw() {
     circle(x1 + width / 2, y2 + height / 2, star.size);
   }
 
-  // Spawn shooting stars dynamically
+  // Occasionally spawn shooting stars
   if (frameCount % int(random(60, 180)) === 0) {
     let angle = PI / 4;
-    let speed = random(8, 12); // slightly slower
+    let speed = random(8, 12);
     shootingStars.push({
       x: random(width * 0.4, width * 1.1),
       y: random(-200, -50),
@@ -50,7 +72,7 @@ function draw() {
     });
   }
 
-  // Update & draw shooting stars
+  // Draw and update shooting stars
   for (let i = shootingStars.length - 1; i >= 0; i--) {
     let s = shootingStars[i];
     s.x += s.speedX;
@@ -83,12 +105,11 @@ function draw() {
 
 function initStars() {
   stars = [];
-  let starCount = 1800;
   let maxRadius = dist(0, 0, width / 2, height / 2) * 1.5;
 
   for (let i = 0; i < starCount; i++) {
     let angle = random(TWO_PI);
-    let radius = sqrt(random()) * maxRadius; // uniform circular spread
+    let radius = sqrt(random()) * maxRadius;
     let x = radius * cos(angle);
     let y = radius * sin(angle);
     stars.push({
@@ -103,7 +124,3 @@ function initStars() {
   }
 }
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  initStars();
-}
