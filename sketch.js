@@ -12,7 +12,7 @@ function setup() {
   const h = Math.floor(window.innerHeight);
   createCanvas(w, h);
 
-  // Force style size to match actual pixels to avoid blurry scale
+  // Force CSS size to match canvas resolution
   canvas.style.width = w + 'px';
   canvas.style.height = h + 'px';
 
@@ -40,7 +40,7 @@ function draw() {
 
   // Draw stars
   for (let star of stars) {
-    star.opacity = map(sin(TWO_PI * t * star.twinkleSpeed * 4 + star.offset), -1, 1, 0.3, 1);
+    star.opacity = map(sin(TWO_PI * t * star.twinkleSpeed * 8 + star.offset), -1, 1, 0.05, 1);
     fill(star.hue, star.hue, 255, star.opacity * 255);
 
     let x1 = star.initialX * cos(baseAngle) - star.initialY * sin(baseAngle);
@@ -50,12 +50,12 @@ function draw() {
     circle(x1 + width / 2, y2 + height / 2, star.size);
   }
 
-  // Occasionally spawn shooting stars
+  // Spawn shooting stars occasionally
   if (frameCount % int(random(60, 180)) === 0) {
     let angle = PI / 4;
     let speed = random(8, 12);
     shootingStars.push({
-      x: random(width * 0.4, width * 1.1),
+      x: random(-width * 0.2, width * 1.2),
       y: random(-200, -50),
       speedX: -speed * cos(angle),
       speedY: speed * sin(angle),
@@ -95,7 +95,7 @@ function draw() {
     }
   }
 
-  // Draw fade on top
+  // Fade-in
   if (fadeAlpha > 0) {
     fill(0, fadeAlpha);
     rect(0, 0, width, height);
@@ -118,12 +118,13 @@ function initStars() {
       initialY: y,
       size: random(0.5, 2.5),
       opacity: random(0.3, 1),
-      twinkleSpeed: random(0.01, 0.07),
+      twinkleSpeed: random(0.03, 0.08),
       offset: random(TWO_PI),
       hue: random(200, 255)
     });
   }
 }
+
 
 
 
