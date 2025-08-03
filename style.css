@@ -3,18 +3,16 @@ html, body {
   padding: 0;
   background: black;
   overflow: hidden;
+  touch-action: none;
 }
 
 canvas {
   display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100vw;
   height: 100vh;
   image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
-
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-  }
-}
-
