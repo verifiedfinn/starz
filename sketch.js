@@ -5,7 +5,7 @@ let fadeAlpha = 255;
 let starCount = 1800;
 
 function setup() {
-  pixelDensity(1); // Avoid scaling issues on mobile
+  pixelDensity(window.devicePixelRatio || 1); // sharp and scaled
   createCanvas(windowWidth, windowHeight);
   frameRate(60);
   angleMode(RADIANS);
@@ -20,21 +20,18 @@ function windowResized() {
 }
 
 function draw() {
-  background(0);
   let t = frameCount / 600;
-  let baseAngle = TWO_PI * 0.04 * t;
-
+  background(0);
   noStroke();
+
+  let baseAngle = TWO_PI * 0.04 * t;
 
   // Twinkling stars
   for (let star of stars) {
-    // Random sharp twinkle flicker
-    if (random() < 0.01) {
-      star.opacity = random(0.1, 1);
-    }
+    let twinkle = sin(t * star.twinkleSpeed + star.offset);
+    star.opacity = map(twinkle, -1, 1, 0.2, 1); // shimmer instead of fading out
     fill(star.hue, star.hue, 255, star.opacity * 255);
 
-    // Rotate star position
     let x1 = star.initialX * cos(baseAngle) - star.initialY * sin(baseAngle);
     let y1 = star.initialX * sin(baseAngle) + star.initialY * cos(baseAngle);
     let y2 = y1 * cos(slant);
@@ -42,14 +39,14 @@ function draw() {
     circle(x1 + width / 2, y2 + height / 2, star.size);
   }
 
-  // Occasionally spawn shooting stars from top right
-  if (frameCount % int(random(90, 180)) === 0) {
-    let angle = PI / 4; // Down-left diagonal
-    let speed = random(8, 12);
+  // Occasionally spawn shooting stars anywhere near the top
+  if (frameCount % int(random(60, 160)) === 0) {
+    let angle = random(PI / 6, PI / 3); // slightly curved diagonal
+    let speed = random(7, 11);
     shootingStars.push({
-      x: random(width * 0.8, width + 100),
+      x: random(0, width),
       y: random(-100, -20),
-      speedX: -speed * cos(angle),
+      speedX: speed * cos(angle),
       speedY: speed * sin(angle),
       length: random(80, 120),
       hue: random(200, 255),
@@ -65,7 +62,7 @@ function draw() {
     s.opacity -= 0.002;
 
     for (let j = 0; j < s.length; j++) {
-      let alpha = s.opacity * (1 - j / s.length) ** 2;
+      let alpha = s.opacity * pow(1 - j / s.length, 2);
       stroke(s.hue, s.hue, 255, alpha * 255);
       strokeWeight(1.5 - 1.25 * (j / s.length));
       let offsetX = s.speedX * j / 6;
@@ -85,6 +82,7 @@ function draw() {
     if (
       s.y > height + 100 ||
       s.x < -100 ||
+      s.x > width + 100 ||
       s.opacity <= 0
     ) {
       shootingStars.splice(i, 1);
@@ -102,7 +100,7 @@ function draw() {
 
 function initStars() {
   stars = [];
-  let maxRadius = dist(0, 0, width / 2, height / 2) * 1.5;
+  let maxRadius = dist(0, 0, width / 2, height / 2) * 1.6;
 
   for (let i = 0; i < starCount; i++) {
     let angle = random(TWO_PI);
@@ -113,11 +111,14 @@ function initStars() {
       initialX: x,
       initialY: y,
       size: random(0.5, 2.5),
-      opacity: random(0.2, 1),
+      opacity: random(0.4, 1),
+      twinkleSpeed: random(2, 5), // higher = faster shimmer
+      offset: random(TWO_PI),
       hue: random(200, 255)
     });
   }
 }
+
 
 
 
