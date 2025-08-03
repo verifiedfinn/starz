@@ -6,19 +6,18 @@ let starCount = 1800;
 
 function setup() {
   const ratio = window.devicePixelRatio || 1;
-  pixelDensity(ratio);
+  pixelDensity(ratio); // Prevent pixelation on mobile
 
   const w = Math.floor(window.innerWidth);
   const h = Math.floor(window.innerHeight);
   createCanvas(w, h);
+
   canvas.style.width = w + 'px';
   canvas.style.height = h + 'px';
 
   frameRate(60);
   angleMode(RADIANS);
-  colorMode(RGB);
   slant = PI / 6;
-
   initStars();
 }
 
@@ -36,11 +35,12 @@ function draw() {
   background(0);
   noStroke();
 
-  let baseAngle = TWO_PI * 0.04 * t + 0.2;
+  let baseAngle = TWO_PI * 0.04 * t + 0.2; // slight skew to make it feel natural
 
+  // Twinkling stars
   for (let star of stars) {
-    let sparkle = sin(TWO_PI * t * star.twinkleSpeed + star.offset);
-    star.opacity = map(sparkle, -1, 1, 0.05, 1);
+    let sparkle = sin(TWO_PI * t * star.twinkleSpeed * 12 + star.offset);
+    star.opacity = map(sparkle, -1, 1, 0.02, 1);
     fill(star.hue, star.hue, 255, star.opacity * 255);
 
     let x1 = star.initialX * cos(baseAngle) - star.initialY * sin(baseAngle);
@@ -50,14 +50,14 @@ function draw() {
     circle(x1 + width / 2, y2 + height / 2, star.size);
   }
 
-  // Shooting stars
+  // Shooting star spawn
   if (frameCount % int(random(60, 180)) === 0) {
-    let angle = random(PI / 4, PI / 3); // sharper ↙
+    let angle = random(PI / 4, PI / 3); // left-down
     let speed = random(8, 12);
     shootingStars.push({
-      x: random(width * 0.3, width * 1.1),
+      x: random(0, width), // full screen range (mobile fix)
       y: random(-150, -50),
-      speedX: -speed * cos(angle), // ← reverse direction
+      speedX: -speed * cos(angle), // angled left
       speedY: speed * sin(angle),
       length: random(80, 120),
       hue: random(200, 255),
@@ -65,6 +65,7 @@ function draw() {
     });
   }
 
+  // Draw & update shooting stars
   for (let i = shootingStars.length - 1; i >= 0; i--) {
     let s = shootingStars[i];
     s.x += s.speedX;
@@ -72,7 +73,7 @@ function draw() {
     s.opacity -= 0.0015;
 
     for (let j = 0; j < s.length; j++) {
-      let alpha = s.opacity * pow(1 - j / s.length, 2);
+      let alpha = s.opacity * (1 - j / s.length) ** 2;
       stroke(s.hue, s.hue, 255, alpha * 255);
       strokeWeight(1.5 - 1.25 * (j / s.length));
       let offsetX = s.speedX * j / 6;
@@ -94,7 +95,7 @@ function draw() {
     }
   }
 
-  // Fade-in overlay
+  // Fade-in
   if (fadeAlpha > 0) {
     fill(0, fadeAlpha);
     rect(0, 0, width, height);
@@ -123,6 +124,3 @@ function initStars() {
     });
   }
 }
-
-
-
