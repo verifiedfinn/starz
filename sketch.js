@@ -6,13 +6,12 @@ let starCount = 1800;
 
 function setup() {
   const ratio = window.devicePixelRatio || 1;
-  pixelDensity(ratio); // MUST come before createCanvas
+  pixelDensity(ratio);
 
   const w = Math.floor(window.innerWidth);
   const h = Math.floor(window.innerHeight);
   createCanvas(w, h);
 
-  // Force CSS size to match canvas resolution
   canvas.style.width = w + 'px';
   canvas.style.height = h + 'px';
 
@@ -36,11 +35,12 @@ function draw() {
   background(0);
   noStroke();
 
-  let baseAngle = TWO_PI * 0.04 * t;
+  let baseAngle = TWO_PI * 0.04 * t + 0.2; // Slight skew to center spiral
 
   // Draw stars
   for (let star of stars) {
-    star.opacity = map(sin(TWO_PI * t * star.twinkleSpeed * 8 + star.offset), -1, 1, 0.05, 1);
+    let sparkle = sin(TWO_PI * t * star.twinkleSpeed * 12 + star.offset);
+    star.opacity = map(sparkle, -1, 1, 0.02, 1);
     fill(star.hue, star.hue, 255, star.opacity * 255);
 
     let x1 = star.initialX * cos(baseAngle) - star.initialY * sin(baseAngle);
@@ -50,7 +50,7 @@ function draw() {
     circle(x1 + width / 2, y2 + height / 2, star.size);
   }
 
-  // Spawn shooting stars occasionally
+  // Occasionally spawn shooting stars
   if (frameCount % int(random(60, 180)) === 0) {
     let angle = PI / 4;
     let speed = random(8, 12);
@@ -95,7 +95,7 @@ function draw() {
     }
   }
 
-  // Fade-in
+  // Fade-in effect
   if (fadeAlpha > 0) {
     fill(0, fadeAlpha);
     rect(0, 0, width, height);
@@ -106,7 +106,7 @@ function draw() {
 
 function initStars() {
   stars = [];
-  let maxRadius = dist(0, 0, width / 2, height / 2) * 1.5;
+  let maxRadius = dist(0, 0, width / 2, height / 2) * 1.8;
 
   for (let i = 0; i < starCount; i++) {
     let angle = random(TWO_PI);
@@ -118,12 +118,14 @@ function initStars() {
       initialY: y,
       size: random(0.5, 2.5),
       opacity: random(0.3, 1),
-      twinkleSpeed: random(0.03, 0.08),
+      twinkleSpeed: random(0.08, 0.2), // Faster sparkle
       offset: random(TWO_PI),
       hue: random(200, 255)
     });
   }
 }
+
+
 
 
 
