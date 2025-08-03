@@ -1,13 +1,15 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: black; /* Optional for cleaner fade on dark */
+  background: black;
+  overflow: hidden;
 }
 
 canvas {
   display: block;
-  opacity: 0;
-  animation: fadeIn 2s ease-in-out forwards;
+  width: 100vw;
+  height: 100vh;
+  image-rendering: pixelated;
 }
 
 @keyframes fadeIn {
@@ -15,3 +17,4 @@ canvas {
     opacity: 1;
   }
 }
+
