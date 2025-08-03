@@ -35,12 +35,14 @@ function draw() {
   background(0);
   noStroke();
 
-  let baseAngle = TWO_PI * 0.04 * t + 0.2; // Slight skew to center spiral
+  let baseAngle = TWO_PI * 0.04 * t + 0.2;
 
-  // Draw stars
+  // Draw twinkling stars
   for (let star of stars) {
-    let sparkle = sin(TWO_PI * t * star.twinkleSpeed * 12 + star.offset);
-    star.opacity = map(sparkle, -1, 1, 0.02, 1);
+    let base = sin(TWO_PI * t * star.twinkleSpeed * 10 + star.offset);
+    let flicker = random(0.95, 1.05); // add subtle randomness
+    star.opacity = constrain(map(base * flicker, -1, 1, 0.05, 1), 0.05, 1);
+
     fill(star.hue, star.hue, 255, star.opacity * 255);
 
     let x1 = star.initialX * cos(baseAngle) - star.initialY * sin(baseAngle);
@@ -50,13 +52,14 @@ function draw() {
     circle(x1 + width / 2, y2 + height / 2, star.size);
   }
 
-  // Occasionally spawn shooting stars
+  // Spawn shooting stars randomly
   if (frameCount % int(random(60, 180)) === 0) {
-    let angle = PI / 4;
-    let speed = random(8, 12);
+    let angle = random(PI / 6, PI / 3); // more varied
+    let speed = random(6, 10);
+
     shootingStars.push({
-      x: random(-width * 0.2, width * 1.2),
-      y: random(-200, -50),
+      x: random(width), // Full width spawn
+      y: random(-0.2 * height, 0.3 * height),
       speedX: -speed * cos(angle),
       speedY: speed * sin(angle),
       length: random(80, 120),
@@ -65,7 +68,7 @@ function draw() {
     });
   }
 
-  // Draw and update shooting stars
+  // Update and draw shooting stars
   for (let i = shootingStars.length - 1; i >= 0; i--) {
     let s = shootingStars[i];
     s.x += s.speedX;
@@ -95,7 +98,7 @@ function draw() {
     }
   }
 
-  // Fade-in effect
+  // Fade-in
   if (fadeAlpha > 0) {
     fill(0, fadeAlpha);
     rect(0, 0, width, height);
@@ -118,12 +121,13 @@ function initStars() {
       initialY: y,
       size: random(0.5, 2.5),
       opacity: random(0.3, 1),
-      twinkleSpeed: random(0.08, 0.2), // Faster sparkle
+      twinkleSpeed: random(0.08, 0.2),
       offset: random(TWO_PI),
       hue: random(200, 255)
     });
   }
 }
+
 
 
 
